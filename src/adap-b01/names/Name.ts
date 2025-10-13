@@ -20,7 +20,10 @@ export class Name {
 
     /** Expects that all Name components are properly masked */
     constructor(other: string[], delimiter?: string) {
-        throw new Error("needs implementation or deletion");
+        if (delimiter!==undefined)  {
+            this.delimiter = delimiter;
+        }
+        this.components = [...other]
     }
 
     /**
@@ -29,7 +32,7 @@ export class Name {
      * Users can vary the delimiter character to be used
      */
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation or deletion");
+        return this.components.join(delimiter);
     }
 
     /** 
@@ -38,35 +41,70 @@ export class Name {
      * The control characters in the data string are the default characters
      */
     public asDataString(): string {
-        throw new Error("needs implementation or deletion");
+        let delimiter = DEFAULT_DELIMITER;
+        let dataString = '';
+
+        for (let i=0; i<this.components.length; ++i) {
+            let component = this.components[i];
+            let maskedComponent = '';
+
+            for (let char of component) {
+                if (char === ESCAPE_CHARACTER) {
+                    maskedComponent += ESCAPE_CHARACTER + ESCAPE_CHARACTER;
+                } else if (char === delimiter) {
+                    maskedComponent += ESCAPE_CHARACTER + delimiter;
+                } else {
+                    maskedComponent += char;
+                }
+            }
+
+            dataString += maskedComponent;
+            
+            if (i<this.components.length-1) {
+                dataString += delimiter;
+            }
+        }
+        
+        return dataString;
     }
 
     public getComponent(i: number): string {
-        throw new Error("needs implementation or deletion");
+        if (i<0 || i>=this.components.length) {
+            throw new Error("Out of scope: getComponent");
+        }
+        return this.components[i];
     }
 
     /** Expects that new Name component c is properly masked */
     public setComponent(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (i<0 || i>=this.components.length) {
+            throw new Error("Out of scope: setComponent");
+        }
+        this.components[i] = c;
     }
 
      /** Returns number of components in Name instance */
      public getNoComponents(): number {
-        throw new Error("needs implementation or deletion");
+        return this.components.length;
     }
 
     /** Expects that new Name component c is properly masked */
     public insert(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (i<0 || i>this.components.length) {
+            throw new Error("Out of scope: insert");
+        }
+        this.components.splice(i, 0, c);
     }
 
     /** Expects that new Name component c is properly masked */
     public append(c: string): void {
-        throw new Error("needs implementation or deletion");
+        this.components.push(c);
     }
 
     public remove(i: number): void {
-        throw new Error("needs implementation or deletion");
+        if (i < 0 || i >= this.components.length) {
+            throw new Error("Out of scope: remove");
+        }
+        this.components.splice(i, 1);
     }
-
 }
