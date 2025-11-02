@@ -6,53 +6,63 @@ export class StringName implements Name {
     protected delimiter: string = DEFAULT_DELIMITER;
     protected name: string = "";
     protected noComponents: number = 0;
+    protected components: string[] = [];
 
     constructor(source: string, delimiter?: string) {
-        throw new Error("needs implementation or deletion");
+        this.delimiter = delimiter ?? DEFAULT_DELIMITER;
+        this.name = source;
+        this.components = source ? source.split(this.delimiter) : [];
+        this.noComponents = this.components.length;
     }
 
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation or deletion");
+         return this.components.join(delimiter);
     }
 
     public asDataString(): string {
-        throw new Error("needs implementation or deletion");
+        return this.name;
     }
 
     public getDelimiterCharacter(): string {
-        throw new Error("needs implementation or deletion");
+        return this.delimiter;
     }
 
     public isEmpty(): boolean {
-        throw new Error("needs implementation or deletion");
+        return this.components.length === 0;
     }
 
     public getNoComponents(): number {
-        throw new Error("needs implementation or deletion");
+        return this.noComponents;
     }
 
     public getComponent(x: number): string {
-        throw new Error("needs implementation or deletion");
+        return this.components[x];
     }
 
     public setComponent(n: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        this.components[n] = c;
+        this.name = this.asString();
     }
 
     public insert(n: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+         this.components.splice(n, 0, c);
+        this.name = this.asString();
     }
 
     public append(c: string): void {
-        throw new Error("needs implementation or deletion");
+        this.components.push(c);
+        this.name = this.asString();
     }
 
     public remove(n: number): void {
-        throw new Error("needs implementation or deletion");
+        this.components.splice(n, 1);
+        this.name = this.asString();
     }
 
     public concat(other: Name): void {
-        throw new Error("needs implementation or deletion");
+        const otherStr = other.asString(this.delimiter);
+        this.name = this.name + this.delimiter + otherStr;
+        this.components = this.name.split(this.delimiter);
     }
 
 }
