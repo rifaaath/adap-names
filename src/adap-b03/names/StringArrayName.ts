@@ -1,30 +1,19 @@
 import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
 import { Name } from "./Name";
+import { AbstractName } from "./AbstractName";
 
-export class StringArrayName implements Name {
+export class StringArrayName extends AbstractName {
 
-    protected delimiter: string = DEFAULT_DELIMITER;
     protected components: string[] = [];
 
     constructor(source: string[], delimiter?: string) {
-        this.delimiter = delimiter ?? DEFAULT_DELIMITER;
-        this.components = source;
+        super(delimiter);
+        // Copy the source to prevent external mutation affecting this instance
+        this.components = [...source];
     }
 
-    public asString(delimiter: string = this.delimiter): string {
-        return this.components.join(delimiter);
-    }
-
-    public asDataString(): string {
-        return this.asString();
-    }
-
-    public getDelimiterCharacter(): string {
-        return this.delimiter;
-    }
-
-    public isEmpty(): boolean {
-        return this.components.length === 0;
+    public clone(): Name {
+        return new StringArrayName([...this.components], this.delimiter);
     }
 
     public getNoComponents(): number {
@@ -51,9 +40,9 @@ export class StringArrayName implements Name {
         this.components.splice(i, 1);
     }
 
-    public concat(other: Name): void {
-        const otherStr = other.asString(this.delimiter);
-        this.components = this.asString().split(this.delimiter).concat(otherStr.split(this.delimiter));
+    // Optimization: We override asString because array.join is faster 
+    // than the generic loop in AbstractName.
+    public asString(delimiter: string = this.delimiter): string {
+        return this.components.join(delimiter);
     }
-
 }

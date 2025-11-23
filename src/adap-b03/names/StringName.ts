@@ -1,68 +1,64 @@
 import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
 import { Name } from "./Name";
+import { AbstractName } from "./AbstractName";
 
-export class StringName implements Name {
+export class StringName extends AbstractName {
 
-    protected delimiter: string = DEFAULT_DELIMITER;
     protected name: string = "";
-    protected noComponents: number = 0;
-    protected components: string[] = [];
 
     constructor(source: string, delimiter?: string) {
-        this.delimiter = delimiter ?? DEFAULT_DELIMITER;
+        super(delimiter);
         this.name = source;
-        this.components = source ? source.split(this.delimiter) : [];
-        this.noComponents = this.components.length;
     }
 
-    public asString(delimiter: string = this.delimiter): string {
-         return this.components.join(delimiter);
-    }
-
-    public asDataString(): string {
-        return this.name;
-    }
-
-    public getDelimiterCharacter(): string {
-        return this.delimiter;
-    }
-
-    public isEmpty(): boolean {
-        return this.components.length === 0;
+    public clone(): Name {
+        return new StringName(this.name, this.delimiter);
     }
 
     public getNoComponents(): number {
-        return this.noComponents;
+        if (this.name.length === 0) return 0;
+        // Split is expensive, but necessary for this data structure type
+        return this.name.split(this.delimiter).length;
     }
 
-    public getComponent(x: number): string {
-        return this.components[x];
+    public getComponent(i: number): string {
+        return this.name.split(this.delimiter)[i];
     }
 
-    public setComponent(n: number, c: string): void {
-        this.components[n] = c;
-        this.name = this.asString();
+    public setComponent(i: number, c: string): void {
+        const comps = this.name.split(this.delimiter);
+        comps[i] = c;
+        this.name = comps.join(this.delimiter);
     }
 
-    public insert(n: number, c: string): void {
-         this.components.splice(n, 0, c);
-        this.name = this.asString();
+    public insert(i: number, c: string): void {
+        let comps: string[] = [];
+        if (this.name.length > 0) {
+            comps = this.name.split(this.delimiter);
+        }
+        comps.splice(i, 0, c);
+        this.name = comps.join(this.delimiter);
     }
 
     public append(c: string): void {
-        this.components.push(c);
-        this.name = this.asString();
+        if (this.name.length === 0) {
+            this.name = c;
+        } else {
+            this.name += this.delimiter + c;
+        }
     }
 
-    public remove(n: number): void {
-        this.components.splice(n, 1);
-        this.name = this.asString();
+    public remove(i: number): void {
+        const comps = this.name.split(this.delimiter);
+        comps.splice(i, 1);
+        this.name = comps.join(this.delimiter);
     }
-
-    public concat(other: Name): void {
-        const otherStr = other.asString(this.delimiter);
-        this.name = this.name + this.delimiter + otherStr;
-        this.components = this.name.split(this.delimiter);
+    
+    // Optimization: Override asString as we already have the string ready
+    public asString(delimiter: string = this.delimiter): string {
+        if (delimiter === this.delimiter) {
+            return this.name;
+        }
+        return this.name.split(this.delimiter).join(delimiter);
     }
-
 }
