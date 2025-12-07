@@ -11,7 +11,8 @@ export class RootNode extends Directory {
     }
 
     constructor() {
-        super("", new Object as Directory);
+        // Fix: Pass a placeholder string to satisfy Node's constructor precondition
+        super("ROOT", new Object as Directory);
     }
 
     protected initialize(pn: Directory): void {
@@ -30,4 +31,8 @@ export class RootNode extends Directory {
         // null operation
     }
 
+    protected assertClassInvariant(): void {
+        // Override: RootNode is allowed to have an empty baseName,
+        // so we do not enforce the check here.
+    }
 }

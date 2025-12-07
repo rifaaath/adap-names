@@ -1,18 +1,21 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { InvalidStateException } from "../common/InvalidStateException";
-
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
 
-export class Node {
+export abstract class Node {
 
     protected baseName: string = "";
     protected parentNode: Directory;
 
     constructor(bn: string, pn: Directory) {
+        if (bn === "") {
+            throw new IllegalArgumentException("Precondition failed: baseName cannot be empty");
+        }
         this.doSetBaseName(bn);
-        this.parentNode = pn; // why oh why do I have to set this
+        this.parentNode = pn;
         this.initialize(pn);
+        this.assertClassInvariant();
     }
 
     protected initialize(pn: Directory): void {
@@ -33,7 +36,10 @@ export class Node {
     }
 
     public getBaseName(): string {
-        return this.doGetBaseName();
+        const bn = this.doGetBaseName();
+        // The invariant check here detects the corrupted state from BuggyFile
+        this.assertClassInvariant(); 
+        return bn;
     }
 
     protected doGetBaseName(): string {
@@ -41,7 +47,11 @@ export class Node {
     }
 
     public rename(bn: string): void {
+        if (bn === "") {
+            throw new IllegalArgumentException("Precondition failed: baseName cannot be empty");
+        }
         this.doSetBaseName(bn);
+        this.assertClassInvariant();
     }
 
     protected doSetBaseName(bn: string): void {
@@ -53,11 +63,20 @@ export class Node {
     }
 
     /**
+     * Validates the object state.
+     * Invariant: baseName must not be empty.
+     */
+    protected assertClassInvariant(): void {
+        // We access this.baseName directly here to check state
+        if (this.baseName === "") {
+            throw new InvalidStateException("Class Invariant failed: Base name cannot be empty");
+        }
+    }
+
+    /**
      * Returns all nodes in the tree that match bn
      * @param bn basename of node being searched for
      */
-    public findNodes(bn: string): Set<Node> {
-        throw new Error("needs implementation or deletion");
-    }
+    public abstract findNodes(bn: string): Set<Node>;
 
 }

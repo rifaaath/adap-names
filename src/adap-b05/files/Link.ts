@@ -13,6 +13,16 @@ export class Link extends Node {
         }
     }
 
+    public findNodes(bn: string): Set<Node> {
+        const result = new Set<Node>();
+        // Leaf node logic: check self. 
+        // (Usually findNodes searches by the Link's name, not the target's name)
+        if (this.getBaseName() === bn) {
+            result.add(this);
+        }
+        return result;
+    }
+
     public getTargetNode(): Node | null {
         return this.targetNode;
     }

@@ -17,7 +17,25 @@ export class Directory extends Node {
     }
 
     public removeChildNode(cn: Node): void {
-        this.childNodes.delete(cn); // Yikes! Should have been called remove
+        this.childNodes.delete(cn);
+    }
+
+    public findNodes(bn: string): Set<Node> {
+        const result = new Set<Node>();
+        
+        // 1. Check self
+        if (this.getBaseName() === bn) {
+            result.add(this);
+        }
+
+        // 2. Delegate to children (Recursive step)
+        for (const child of this.childNodes) {
+            const childResults = child.findNodes(bn);
+            // Merge results
+            childResults.forEach(n => result.add(n));
+        }
+
+        return result;
     }
 
 }

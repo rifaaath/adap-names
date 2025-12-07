@@ -16,6 +16,15 @@ export class File extends Node {
         super(baseName, parent);
     }
 
+    public findNodes(bn: string): Set<Node> {
+        const result = new Set<Node>();
+        // Leaf node: only check self
+        if (this.getBaseName() === bn) {
+            result.add(this);
+        }
+        return result;
+    }
+
     public open(): void {
         // do something
     }
